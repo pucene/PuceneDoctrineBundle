@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity repository-class="Pucene\Bundle\DoctrineBundle\Repository\FieldRepository"
+            name="Pucene\Bundle\DoctrineBundle\Entity\Field"
+            table="pu_field">
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <field name="name" type="string" column="name" length="255"/>
+
+        <one-to-many field="tokens"
+                     target-entity="Pucene\Bundle\DoctrineBundle\Entity\Token"
+                     mapped-by="field"
+                     fetch="EXTRA_LAZY">
+            <cascade>
+                <cascade-remove />
+            </cascade>
+        </one-to-many>
+
+        <many-to-one field="document" target-entity="Pucene\Bundle\DoctrineBundle\Entity\Document">
+            <join-columns>
+                <join-column name="document_id" referenced-column-name="id" on-delete="CASCADE" nullable="false"/>
+            </join-columns>
+        </many-to-one>
+
+        <many-to-one field="mapping" target-entity="Pucene\Bundle\DoctrineBundle\Entity\Mapping">
+            <join-columns>
+                <join-column name="mapping_id" referenced-column-name="id" on-delete="CASCADE" nullable="false"/>
+            </join-columns>
+        </many-to-one>
+    </entity>
+</doctrine-mapping>

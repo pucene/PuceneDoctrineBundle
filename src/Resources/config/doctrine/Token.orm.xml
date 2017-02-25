@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity repository-class="Pucene\Bundle\DoctrineBundle\Repository\TokenRepository"
+            name="Pucene\Bundle\DoctrineBundle\Entity\Token"
+            table="pu_token">
+        <unique-constraints>
+            <unique-constraint columns="field_id,position"/>
+        </unique-constraints>
+
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <field name="position" type="integer" column="position" nullable="false"/>
+        <field name="value" type="string" column="value" length="255" nullable="false"/>
+
+        <many-to-one field="field" target-entity="Pucene\Bundle\DoctrineBundle\Entity\Field">
+            <join-columns>
+                <join-column name="field_id" referenced-column-name="id" on-delete="CASCADE" nullable="false"/>
+            </join-columns>
+        </many-to-one>
+    </entity>
+</doctrine-mapping>

@@ -1,6 +1,6 @@
 {
     "name": "pucene/doctrine-bundle",
-    "description": "Integrates pucene in symfony with a doctrine storage layer. Edit",
+    "description": "Integrates pucene in symfony with a doctrine storage layer.",
     "authors": [
         {
             "name": "Pucene Community",
@@ -17,6 +17,13 @@
     "type": "symfony-bundle",
     "license": "MIT",
     "require": {
+        "symfony/http-kernel": "^2.8 || ^3.0",
+        "symfony/dependency-injection": "^2.8 || ^3.0",
+        "symfony/config": "^2.8 || ^3.0",
+        "symfony/console": "^2.8 || ^3.0",
+        "doctrine/orm": "^2.5",
+        "doctrine/doctrine-bundle": "^1.6",
+        "doctrine/doctrine-cache-bundle": "^1.2",
         "pucene/pucene": "dev-master",
         "pucene/core": "@dev"
     },
