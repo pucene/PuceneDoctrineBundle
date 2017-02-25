@@ -2,9 +2,24 @@
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
-    <!--
     <services>
+        <service id="pucene_doctrine.inverted_index.storage" class="Pucene\InvertedIndex\ArrayStorage"/>
 
+        <service id="pucene_doctrine.inverted_index" class="Pucene\InvertedIndex\InvertedIndex">
+            <argument type="service" id="pucene_doctrine.inverted_index.storage"/>
+        </service>
+
+        <service id="pucene_doctrine.analyzer.standard" class="Pucene\Analysis\StandardAnalyzer"/>
+
+        <service id="pucene_doctrine.index_factory" class="Pucene\Index\IndexFactory">
+            <argument type="service" id="pucene_doctrine.analyzer.standard"/>
+            <argument type="service" id="pucene_doctrine.inverted_index"/>
+        </service>
+
+        <service id="pucene_doctrine.indices.test" class="Pucene\Index\Index">
+            <factory service="pucene_doctrine.index_factory" method="create"/>
+
+            <argument type="string">test</argument>
+        </service>
     </services>
-    -->
 </container>
