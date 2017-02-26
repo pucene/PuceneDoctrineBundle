@@ -2,7 +2,7 @@
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
-    <entity repository-class="Pucene\Bundle\DoctrineBundle\Repository\BaseRepository"
+    <entity repository-class="Pucene\Bundle\DoctrineBundle\Repository\DocumentRepository"
             name="Pucene\Bundle\DoctrineBundle\Entity\Document"
             table="pu_document">
         <id name="id" type="string" column="id">

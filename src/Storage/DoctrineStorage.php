@@ -5,9 +5,9 @@ namespace Pucene\Bundle\DoctrineBundle\Storage;
 use Pucene\Analysis\Token;
 use Pucene\Bundle\DoctrineBundle\Entity\Document;
 use Pucene\Bundle\DoctrineBundle\Entity\Token as TokenEntity;
+use Pucene\Bundle\DoctrineBundle\Repository\DocumentRepositoryInterface;
 use Pucene\Bundle\DoctrineBundle\Repository\FieldRepositoryInterface;
 use Pucene\Bundle\DoctrineBundle\Repository\RepositoryInterface;
-use Pucene\Bundle\DoctrineBundle\Repository\TokenRepositoryInterface;
 use Pucene\Bundle\DoctrineBundle\Repository\TransactionManager;
 use Pucene\InvertedIndex\StorageInterface;
 
@@ -24,26 +24,26 @@ class DoctrineStorage implements StorageInterface
     private $fieldRepository;
 
     /**
-     * @var RepositoryInterface
+     * @var DocumentRepositoryInterface
      */
     private $documentRepository;
 
     /**
-     * @var TokenRepositoryInterface
+     * @var RepositoryInterface
      */
     private $tokenRepository;
 
     /**
      * @param TransactionManager $transactionManager
      * @param FieldRepositoryInterface $fieldRepository
-     * @param RepositoryInterface $documentRepository
-     * @param TokenRepositoryInterface $tokenRepository
+     * @param DocumentRepositoryInterface $documentRepository
+     * @param RepositoryInterface $tokenRepository
      */
     public function __construct(
         TransactionManager $transactionManager,
         FieldRepositoryInterface $fieldRepository,
-        RepositoryInterface $documentRepository,
-        TokenRepositoryInterface $tokenRepository
+        DocumentRepositoryInterface $documentRepository,
+        RepositoryInterface $tokenRepository
     ) {
         $this->transactionManager = $transactionManager;
         $this->fieldRepository = $fieldRepository;
@@ -91,7 +91,7 @@ class DoctrineStorage implements StorageInterface
             function (Document $document) {
                 return $document->getData();
             },
-            $this->tokenRepository->findDocuments($token->getToken())
+            $this->documentRepository->findByToken($token->getToken())
         );
     }
 }
