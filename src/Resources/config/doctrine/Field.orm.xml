@@ -25,11 +25,5 @@
                 <join-column name="document_id" referenced-column-name="id" on-delete="CASCADE" nullable="false"/>
             </join-columns>
         </many-to-one>
-
-        <many-to-one field="mapping" target-entity="Pucene\Bundle\DoctrineBundle\Entity\Mapping">
-            <join-columns>
-                <join-column name="mapping_id" referenced-column-name="id" on-delete="CASCADE" nullable="false"/>
-            </join-columns>
-        </many-to-one>
     </entity>
 </doctrine-mapping>

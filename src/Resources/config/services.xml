@@ -3,7 +3,33 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
-        <service id="pucene_doctrine.inverted_index.storage" class="Pucene\InvertedIndex\ArrayStorage"/>
+        <service id="pucene_doctrine.repository.document" class="Pucene\Bundle\DoctrineBundle\Repository\BaseRepository">
+            <factory service="doctrine.orm.entity_manager" method="getRepository"/>
+
+            <argument type="string">PuceneDoctrineBundle:Document</argument>
+        </service>
+        <service id="pucene_doctrine.repository.field" class="Pucene\Bundle\DoctrineBundle\Repository\FieldRepository">
+            <factory service="doctrine.orm.entity_manager" method="getRepository"/>
+
+            <argument type="string">PuceneDoctrineBundle:Field</argument>
+        </service>
+        <service id="pucene_doctrine.repository.token" class="Pucene\Bundle\DoctrineBundle\Repository\BaseRepository">
+            <factory service="doctrine.orm.entity_manager" method="getRepository"/>
+
+            <argument type="string">PuceneDoctrineBundle:Token</argument>
+        </service>
+
+        <service id="pucene_doctrine.transaction_manager"
+                 class="Pucene\Bundle\DoctrineBundle\Repository\TransactionManager">
+            <argument type="service" id="doctrine.orm.entity_manager"/>
+        </service>
+
+        <service id="pucene_doctrine.inverted_index.storage" class="Pucene\Bundle\DoctrineBundle\Storage\DoctrineStorage">
+            <argument type="service" id="pucene_doctrine.transaction_manager"/>
+            <argument type="service" id="pucene_doctrine.repository.field"/>
+            <argument type="service" id="pucene_doctrine.repository.document"/>
+            <argument type="service" id="pucene_doctrine.repository.token"/>
+        </service>
 
         <service id="pucene_doctrine.inverted_index" class="Pucene\InvertedIndex\InvertedIndex">
             <argument type="service" id="pucene_doctrine.inverted_index.storage"/>

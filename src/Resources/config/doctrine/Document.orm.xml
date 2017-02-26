@@ -2,15 +2,18 @@
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
-    <entity repository-class="Pucene\Bundle\DoctrineBundle\Repository\DocumentRepository"
+    <entity repository-class="Pucene\Bundle\DoctrineBundle\Repository\BaseRepository"
             name="Pucene\Bundle\DoctrineBundle\Entity\Document"
             table="pu_document">
         <id name="id" type="string" column="id">
             <generator strategy="NONE"/>
         </id>
+        <id name="indexName" type="string" column="indexName">
+            <generator strategy="NONE"/>
+        </id>
 
         <field name="type" type="string" column="type" length="255" nullable="false"/>
-        <field name="data" type="json" column="data" nullable="false"/>
+        <field name="data" type="json_array" column="data" nullable="false"/>
 
         <one-to-many field="fields"
                      target-entity="Pucene\Bundle\DoctrineBundle\Entity\Field"
@@ -19,11 +22,5 @@
                 <cascade-remove />
             </cascade>
         </one-to-many>
-
-        <many-to-one field="index" target-entity="Pucene\Bundle\DoctrineBundle\Entity\Index">
-            <join-columns>
-                <join-column name="index_id" referenced-column-name="id" on-delete="CASCADE" nullable="false"/>
-            </join-columns>
-        </many-to-one>
     </entity>
 </doctrine-mapping>

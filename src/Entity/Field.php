@@ -16,11 +16,6 @@ class Field
     private $id;
 
     /**
-     * @var Mapping
-     */
-    private $mapping;
-
-    /**
      * @var Document
      */
     private $document;
@@ -35,25 +30,15 @@ class Field
      */
     private $tokens;
 
-    /**
-     * Field constructor.
-     *
-     * @param Document $document
-     * @param Mapping $mapping
-     * @param string $name
-     */
-    public function __construct(Document $document, Mapping $mapping, $name)
+    public function __construct()
     {
-        $this->document = $document;
-        $this->mapping = $mapping;
-        $this->name = $name;
         $this->tokens = new ArrayCollection();
     }
 
     /**
-     * Get id.
+     * Returns id.
      *
-     * @return integer
+     * @return string
      */
     public function getId()
     {
@@ -61,7 +46,21 @@ class Field
     }
 
     /**
-     * Get document.
+     * Set id.
+     *
+     * @param string $id
+     *
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Returns document.
      *
      * @return Document
      */
@@ -71,17 +70,21 @@ class Field
     }
 
     /**
-     * Get mapping.
+     * Set document.
      *
-     * @return Mapping
+     * @param Document $document
+     *
+     * @return $this
      */
-    public function getMapping()
+    public function setDocument($document)
     {
-        return $this->mapping;
+        $this->document = $document;
+
+        return $this;
     }
 
     /**
-     * Get name.
+     * Returns name.
      *
      * @return string
      */
@@ -91,13 +94,41 @@ class Field
     }
 
     /**
-     * Get tokens.
+     * Set name.
      *
-     * @return Collection|Token[]
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Returns tokens.
+     *
+     * @return Collection
      */
     public function getTokens()
     {
         return $this->tokens;
+    }
+
+    /**
+     * Set tokens.
+     *
+     * @param Collection $tokens
+     *
+     * @return $this
+     */
+    public function setTokens($tokens)
+    {
+        $this->tokens = $tokens;
+
+        return $this;
     }
 
     /**
@@ -110,6 +141,8 @@ class Field
     public function addToken($token)
     {
         $this->tokens->add($token);
+
+        return $this;
     }
 
     /**
@@ -122,6 +155,8 @@ class Field
     public function removeToken($token)
     {
         $this->tokens->add($token);
+
+        return $this;
     }
 }
 
