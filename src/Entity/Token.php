@@ -10,41 +10,42 @@ class Token
     /**
      * @var integer
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      */
-    private $value;
+    protected $token;
 
     /**
-     * @var integer
+     * @var int
      */
-    private $position;
+    protected $startOffset;
+
+    /**
+     * @var int
+     */
+    protected $endOffset;
+
+    /**
+     * @var string
+     */
+    protected $type;
+
+    /**
+     * @var int
+     */
+    protected $position;
 
     /**
      * @var Field
      */
-    private $field;
+    protected $field;
 
     /**
-     * Token constructor.
+     * Returns id.
      *
-     * @param Field $field
-     * @param string $value
-     * @param integer $position
-     */
-    public function __construct(Field $field, $value, $position)
-    {
-        $this->field = $field;
-        $this->value = $value;
-        $this->position = $position;
-    }
-
-    /**
-     * Get id.
-     *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -52,7 +53,141 @@ class Token
     }
 
     /**
-     * Get field.
+     * Set id.
+     *
+     * @param int $id
+     *
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Returns token.
+     *
+     * @return string
+     */
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    /**
+     * Set token.
+     *
+     * @param string $token
+     *
+     * @return $this
+     */
+    public function setToken($token)
+    {
+        $this->token = $token;
+
+        return $this;
+    }
+
+    /**
+     * Returns startOffset.
+     *
+     * @return int
+     */
+    public function getStartOffset()
+    {
+        return $this->startOffset;
+    }
+
+    /**
+     * Set startOffset.
+     *
+     * @param int $startOffset
+     *
+     * @return $this
+     */
+    public function setStartOffset($startOffset)
+    {
+        $this->startOffset = $startOffset;
+
+        return $this;
+    }
+
+    /**
+     * Returns endOffset.
+     *
+     * @return int
+     */
+    public function getEndOffset()
+    {
+        return $this->endOffset;
+    }
+
+    /**
+     * Set endOffset.
+     *
+     * @param int $endOffset
+     *
+     * @return $this
+     */
+    public function setEndOffset($endOffset)
+    {
+        $this->endOffset = $endOffset;
+
+        return $this;
+    }
+
+    /**
+     * Returns type.
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Set type.
+     *
+     * @param string $type
+     *
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Returns position.
+     *
+     * @return int
+     */
+    public function getPosition()
+    {
+        return $this->position;
+    }
+
+    /**
+     * Set position.
+     *
+     * @param int $position
+     *
+     * @return $this
+     */
+    public function setPosition($position)
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    /**
+     * Returns field.
      *
      * @return Field
      */
@@ -62,35 +197,15 @@ class Token
     }
 
     /**
-     * Get position.
+     * Set field.
      *
-     * @return integer
-     */
-    public function getPosition()
-    {
-        return $this->position;
-    }
-
-    /**
-     * Get value.
-     *
-     * @return string
-     */
-    public function getValue()
-    {
-        return $this->value;
-    }
-
-    /**
-     * Set value.
-     *
-     * @param string $value
+     * @param Field $field
      *
      * @return $this
      */
-    public function setValue($value)
+    public function setField($field)
     {
-        $this->value = $value;
+        $this->field = $field;
 
         return $this;
     }

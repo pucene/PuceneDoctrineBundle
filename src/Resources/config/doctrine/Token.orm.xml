@@ -2,7 +2,7 @@
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
-    <entity repository-class="Pucene\Bundle\DoctrineBundle\Repository\TokenRepository"
+    <entity repository-class="Pucene\Bundle\DoctrineBundle\Repository\BaseRepository"
             name="Pucene\Bundle\DoctrineBundle\Entity\Token"
             table="pu_token">
         <unique-constraints>
@@ -13,8 +13,11 @@
             <generator strategy="AUTO"/>
         </id>
 
+        <field name="token" type="string" column="token" length="255" nullable="false"/>
+        <field name="startOffset" type="integer" column="startOffset" nullable="false"/>
+        <field name="endOffset" type="integer" column="endOffset" nullable="false"/>
         <field name="position" type="integer" column="position" nullable="false"/>
-        <field name="value" type="string" column="value" length="255" nullable="false"/>
+        <field name="type" type="string" column="type" nullable="false"/>
 
         <many-to-one field="field" target-entity="Pucene\Bundle\DoctrineBundle\Entity\Field">
             <join-columns>

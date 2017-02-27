@@ -23,34 +23,17 @@ class Document
     /**
      * @var string
      */
-    private $data;
+    private $indexName;
 
     /**
-     * @var Index
+     * @var string
      */
-    private $index;
+    private $data;
 
     /**
      * @var Collection
      */
     private $fields;
-
-    /**
-     * Test constructor.
-     *
-     * @param Index $index
-     * @param string $id
-     * @param string $type
-     * @param string $data
-     */
-    public function __construct(Index $index, $id, $type, $data)
-    {
-        $this->index = $index;
-        $this->id = $id;
-        $this->type = $type;
-        $this->data = $data;
-        $this->fields = new ArrayCollection();
-    }
 
     /**
      * Get id.
@@ -63,13 +46,41 @@ class Document
     }
 
     /**
-     * Get index.
+     * Set id.
      *
-     * @return Index
+     * @param string $id
+     *
+     * @return $this
      */
-    public function getIndex()
+    public function setId($id)
     {
-        return $this->index;
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Returns index-name.
+     *
+     * @return string
+     */
+    public function getIndexName()
+    {
+        return $this->indexName;
+    }
+
+    /**
+     * Set index-name.
+     *
+     * @param string $indexName
+     *
+     * @return $this
+     */
+    public function setIndexName($indexName)
+    {
+        $this->indexName = $indexName;
+
+        return $this;
     }
 
     /**
@@ -80,6 +91,20 @@ class Document
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * Set type.
+     *
+     * @param string $type
+     *
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
     }
 
     /**
@@ -117,6 +142,20 @@ class Document
     }
 
     /**
+     * Set fields.
+     *
+     * @param Collection $fields
+     *
+     * @return $this
+     */
+    public function setFields($fields)
+    {
+        $this->fields = $fields;
+
+        return $this;
+    }
+
+    /**
      * Add field.
      *
      * @param Field $field
@@ -126,6 +165,8 @@ class Document
     public function addField($field)
     {
         $this->fields->add($field);
+
+        return $this;
     }
 
     /**
@@ -138,6 +179,8 @@ class Document
     public function removeField($field)
     {
         $this->fields->add($field);
+
+        return $this;
     }
 }
 
