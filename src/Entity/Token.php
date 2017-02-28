@@ -8,7 +8,7 @@ namespace Pucene\Bundle\DoctrineBundle\Entity;
 class Token
 {
     /**
-     * @var integer
+     * @var int
      */
     protected $id;
 
@@ -210,4 +210,3 @@ class Token
         return $this;
     }
 }
-
