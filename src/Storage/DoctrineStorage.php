@@ -5,10 +5,12 @@ namespace Pucene\Bundle\DoctrineBundle\Storage;
 use Pucene\Analysis\Token;
 use Pucene\Bundle\DoctrineBundle\Entity\Document;
 use Pucene\Bundle\DoctrineBundle\Entity\Token as TokenEntity;
+use Pucene\Bundle\DoctrineBundle\QueryBuilder\SearchExecutor;
 use Pucene\Bundle\DoctrineBundle\Repository\DocumentRepositoryInterface;
 use Pucene\Bundle\DoctrineBundle\Repository\FieldRepositoryInterface;
 use Pucene\Bundle\DoctrineBundle\Repository\RepositoryInterface;
 use Pucene\Bundle\DoctrineBundle\Repository\TransactionManager;
+use Pucene\Component\QueryBuilder\Search;
 use Pucene\InvertedIndex\StorageInterface;
 
 class DoctrineStorage implements StorageInterface
@@ -34,21 +36,29 @@ class DoctrineStorage implements StorageInterface
     private $tokenRepository;
 
     /**
+     * @var SearchExecutor
+     */
+    private $searchExecutor;
+
+    /**
      * @param TransactionManager $transactionManager
      * @param FieldRepositoryInterface $fieldRepository
      * @param DocumentRepositoryInterface $documentRepository
      * @param RepositoryInterface $tokenRepository
+     * @param SearchExecutor $searchExecutor
      */
     public function __construct(
         TransactionManager $transactionManager,
         FieldRepositoryInterface $fieldRepository,
         DocumentRepositoryInterface $documentRepository,
-        RepositoryInterface $tokenRepository
+        RepositoryInterface $tokenRepository,
+        SearchExecutor $searchExecutor
     ) {
         $this->transactionManager = $transactionManager;
         $this->fieldRepository = $fieldRepository;
         $this->documentRepository = $documentRepository;
         $this->tokenRepository = $tokenRepository;
+        $this->searchExecutor = $searchExecutor;
     }
 
     public function save(Token $token, array $document, $fieldName)
@@ -85,13 +95,13 @@ class DoctrineStorage implements StorageInterface
         $this->transactionManager->finish();
     }
 
-    public function getDocuments(Token $token)
+    public function search(Search $search)
     {
         return array_map(
             function (Document $document) {
                 return $document->getData();
             },
-            $this->documentRepository->findByToken($token->getToken())
+            $this->searchExecutor->execute($search)
         );
     }
 }
