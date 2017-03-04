@@ -3,7 +3,7 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
-        <service id="pucene_doctrine.repository.document" class="Pucene\Bundle\DoctrineBundle\Repository\BaseRepository">
+        <service id="pucene_doctrine.repository.document" class="Pucene\Bundle\DoctrineBundle\Repository\DocumentRepository">
             <factory service="doctrine.orm.entity_manager" method="getRepository"/>
 
             <argument type="string">PuceneDoctrineBundle:Document</argument>
@@ -24,11 +24,17 @@
             <argument type="service" id="doctrine.orm.entity_manager"/>
         </service>
 
+        <service id="pucene_doctrine.search_executor" class="Pucene\Bundle\DoctrineBundle\QueryBuilder\SearchExecutor">
+            <argument type="service" id="doctrine.orm.entity_manager"/>
+            <argument type="service" id="pucene_doctrine.query_builder.pool"/>
+        </service>
+
         <service id="pucene_doctrine.inverted_index.storage" class="Pucene\Bundle\DoctrineBundle\Storage\DoctrineStorage">
             <argument type="service" id="pucene_doctrine.transaction_manager"/>
             <argument type="service" id="pucene_doctrine.repository.field"/>
             <argument type="service" id="pucene_doctrine.repository.document"/>
             <argument type="service" id="pucene_doctrine.repository.token"/>
+            <argument type="service" id="pucene_doctrine.search_executor"/>
         </service>
 
         <service id="pucene_doctrine.inverted_index" class="Pucene\InvertedIndex\InvertedIndex">
