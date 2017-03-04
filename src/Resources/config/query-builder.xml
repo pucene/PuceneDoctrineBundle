@@ -4,11 +4,17 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <service id="pucene_doctrine.query_builder.term"
-                 class="Pucene\Bundle\DoctrineBundle\QueryBuilder\Query\TermLevel\TermQueryBuilder"/>
+                 class="Pucene\Bundle\DoctrineBundle\QueryBuilder\Query\TermLevel\TermQueryBuilder">
+            <tag name="pucene_doctrine.query_builder" query="Pucene\Component\QueryBuilder\Query\TermLevel\Term"/>
+        </service>
         <service id="pucene_doctrine.query_builder.match_all"
-                 class="Pucene\Bundle\DoctrineBundle\QueryBuilder\Query\MatchAllQueryBuilder"/>
+                 class="Pucene\Bundle\DoctrineBundle\QueryBuilder\Query\MatchAllQueryBuilder">
+            <tag name="pucene_doctrine.query_builder" query="Pucene\Component\QueryBuilder\Query\MatchAll"/>
+        </service>
         <service id="pucene_doctrine.query_builder.match"
                  class="Pucene\Bundle\DoctrineBundle\QueryBuilder\Query\FullText\MatchQueryBuilder">
+            <tag name="pucene_doctrine.query_builder" query="Pucene\Component\QueryBuilder\Query\FullText\Match"/>
+
             <argument type="service" id="pucene_doctrine.analyzer.standard"/>
             <argument type="service" id="pucene_doctrine.query_builder.term"/>
         </service>
