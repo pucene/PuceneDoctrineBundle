@@ -40,6 +40,7 @@ class SearchExecutor
             ->select('document')
             ->innerJoin('document.fields', 'field')
             ->innerJoin('field.tokens', 'token')
+            ->innerJoin('token.term', 'term')
             ->setMaxResults($search->getSize())
             ->setFirstResult($search->getFrom());
 

@@ -13,9 +13,9 @@ class Token
     protected $id;
 
     /**
-     * @var string
+     * @var Term
      */
-    protected $token;
+    protected $term;
 
     /**
      * @var int
@@ -67,25 +67,25 @@ class Token
     }
 
     /**
-     * Returns token.
+     * Returns term.
      *
-     * @return string
+     * @return Term
      */
-    public function getToken()
+    public function getTerm()
     {
-        return $this->token;
+        return $this->term;
     }
 
     /**
-     * Set token.
+     * Set term.
      *
-     * @param string $token
+     * @param Term $term
      *
      * @return $this
      */
-    public function setToken($token)
+    public function setTerm(Term $term)
     {
-        $this->token = $token;
+        $this->term = $term;
 
         return $this;
     }

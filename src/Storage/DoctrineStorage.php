@@ -9,6 +9,7 @@ use Pucene\Bundle\DoctrineBundle\QueryBuilder\SearchExecutor;
 use Pucene\Bundle\DoctrineBundle\Repository\DocumentRepositoryInterface;
 use Pucene\Bundle\DoctrineBundle\Repository\FieldRepositoryInterface;
 use Pucene\Bundle\DoctrineBundle\Repository\RepositoryInterface;
+use Pucene\Bundle\DoctrineBundle\Repository\TermRepositoryInterface;
 use Pucene\Bundle\DoctrineBundle\Repository\TransactionManager;
 use Pucene\Component\QueryBuilder\Search;
 use Pucene\InvertedIndex\StorageInterface;
@@ -36,6 +37,11 @@ class DoctrineStorage implements StorageInterface
     private $tokenRepository;
 
     /**
+     * @var TermRepositoryInterface
+     */
+    private $termRepository;
+
+    /**
      * @var SearchExecutor
      */
     private $searchExecutor;
@@ -45,6 +51,7 @@ class DoctrineStorage implements StorageInterface
      * @param FieldRepositoryInterface $fieldRepository
      * @param DocumentRepositoryInterface $documentRepository
      * @param RepositoryInterface $tokenRepository
+     * @param TermRepositoryInterface $termRepository
      * @param SearchExecutor $searchExecutor
      */
     public function __construct(
@@ -52,12 +59,14 @@ class DoctrineStorage implements StorageInterface
         FieldRepositoryInterface $fieldRepository,
         DocumentRepositoryInterface $documentRepository,
         RepositoryInterface $tokenRepository,
+        TermRepositoryInterface $termRepository,
         SearchExecutor $searchExecutor
     ) {
         $this->transactionManager = $transactionManager;
         $this->fieldRepository = $fieldRepository;
         $this->documentRepository = $documentRepository;
         $this->tokenRepository = $tokenRepository;
+        $this->termRepository = $termRepository;
         $this->searchExecutor = $searchExecutor;
     }
 
@@ -80,10 +89,12 @@ class DoctrineStorage implements StorageInterface
             $field = $this->fieldRepository->createForDocument($documentEntity, $fieldName);
         }
 
+        $term = $this->termRepository->findTermOrCreate($token->getTerm());
+
         /** @var TokenEntity $tokenEntity */
         $tokenEntity = $this->tokenRepository->create();
         $tokenEntity->setField($field)
-            ->setToken($token->getToken())
+            ->setTerm($term)
             ->setPosition($token->getPosition())
             ->setStartOffset($token->getStartOffset())
             ->setEndOffset($token->getEndOffset())
@@ -91,6 +102,7 @@ class DoctrineStorage implements StorageInterface
 
         $this->transactionManager->add($documentEntity);
         $this->transactionManager->add($field);
+        $this->transactionManager->add($term);
         $this->transactionManager->add($tokenEntity);
         $this->transactionManager->finish();
     }
