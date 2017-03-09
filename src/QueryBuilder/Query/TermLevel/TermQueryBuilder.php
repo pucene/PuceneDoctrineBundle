@@ -24,7 +24,7 @@ class TermQueryBuilder implements QueryBuilderInterface
         $queryBuilder->setParameter('term_' . $currentIndex, $query->getTerm());
 
         return $queryBuilder->expr()->andX(
-            $queryBuilder->expr()->eq('token.token', ':term_' . $currentIndex),
+            $queryBuilder->expr()->eq('term.term', ':term_' . $currentIndex),
             $queryBuilder->expr()->eq('field.name', ':fieldName_' . $currentIndex)
         );
     }

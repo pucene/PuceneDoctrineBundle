@@ -13,11 +13,16 @@
             <generator strategy="AUTO"/>
         </id>
 
-        <field name="token" type="string" column="token" length="255" nullable="false"/>
         <field name="startOffset" type="integer" column="startOffset" nullable="false"/>
         <field name="endOffset" type="integer" column="endOffset" nullable="false"/>
         <field name="position" type="integer" column="position" nullable="false"/>
         <field name="type" type="string" column="type" nullable="false"/>
+
+        <many-to-one target-entity="Pucene\Bundle\DoctrineBundle\Entity\Term" field="term">
+            <join-columns>
+                <join-column name="term_id" referenced-column-name="id" nullable="false"/>
+            </join-columns>
+        </many-to-one>
 
         <many-to-one field="field" target-entity="Pucene\Bundle\DoctrineBundle\Entity\Field">
             <join-columns>
