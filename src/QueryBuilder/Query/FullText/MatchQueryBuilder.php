@@ -6,6 +6,7 @@ use Doctrine\ORM\QueryBuilder;
 use Pucene\Analysis\AnalyzerInterface;
 use Pucene\Bundle\DoctrineBundle\QueryBuilder\Query\TermLevel\TermQueryBuilder;
 use Pucene\Bundle\DoctrineBundle\QueryBuilder\QueryBuilderInterface;
+use Pucene\Bundle\DoctrineBundle\QueryBuilder\ScoringQueryBuilder;
 use Pucene\Component\QueryBuilder\Query\FullText\Match;
 use Pucene\Component\QueryBuilder\Query\QueryInterface;
 use Pucene\Component\QueryBuilder\Query\TermLevel\Term;
@@ -37,14 +38,28 @@ class MatchQueryBuilder implements QueryBuilderInterface
      *
      * @param Match $query
      */
-    public function build(QueryInterface $query, QueryBuilder $queryBuilder)
+    public function build(QueryInterface $query, QueryBuilder $queryBuilder, ScoringQueryBuilder $scoringQueryBuilder)
     {
         $tokens = $this->analyzer->analyze($query->getQuery());
 
+        $scoringQueryBuilder->open();
+
         $or = $queryBuilder->expr()->orX();
         foreach ($tokens as $token) {
-            $or->add($this->termQueryBuilder->build(new Term($query->getField(), $token->getTerm()), $queryBuilder));
+            $scoringQueryBuilder->open();
+
+            $or->add(
+                $this->termQueryBuilder->build(
+                    new Term($query->getField(), $token->getTerm()),
+                    $queryBuilder,
+                    $scoringQueryBuilder
+                )
+            );
+
+            $scoringQueryBuilder->close();
         }
+
+        $scoringQueryBuilder->close();
 
         return $or;
     }

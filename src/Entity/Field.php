@@ -30,6 +30,11 @@ class Field
      */
     private $tokens;
 
+    /**
+     * @var int
+     */
+    private $numTerms = 0;
+
     public function __construct()
     {
         $this->tokens = new ArrayCollection();
@@ -155,6 +160,37 @@ class Field
     public function removeToken($token)
     {
         $this->tokens->add($token);
+
+        return $this;
+    }
+
+    /**
+     * Returns length.
+     *
+     * @return int
+     */
+    public function getNumTerms()
+    {
+        return $this->numTerms;
+    }
+
+    /**
+     * Set length.
+     *
+     * @param int $numTerms
+     *
+     * @return $this
+     */
+    public function setNumTerms($numTerms)
+    {
+        $this->numTerms = $numTerms;
+
+        return $this;
+    }
+
+    public function increase()
+    {
+        $this->numTerms++;
 
         return $this;
     }

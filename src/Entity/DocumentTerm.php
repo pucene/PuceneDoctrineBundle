@@ -2,12 +2,22 @@
 
 namespace Pucene\Bundle\DoctrineBundle\Entity;
 
-class Term
+class DocumentTerm
 {
     /**
      * @var string
      */
+    private $id;
+
+    /**
+     * @var Term
+     */
     private $term;
+
+    /**
+     * @var Document
+     */
+    private $document;
 
     /**
      * @var int
@@ -15,9 +25,33 @@ class Term
     private $frequency = 0;
 
     /**
-     * Returns term.
+     * Returns id.
      *
      * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set id.
+     *
+     * @param string $id
+     *
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Returns term.
+     *
+     * @return Term
      */
     public function getTerm()
     {
@@ -27,13 +61,37 @@ class Term
     /**
      * Set term.
      *
-     * @param string $term
+     * @param Term $term
      *
      * @return $this
      */
     public function setTerm($term)
     {
         $this->term = $term;
+
+        return $this;
+    }
+
+    /**
+     * Returns document.
+     *
+     * @return Document
+     */
+    public function getDocument()
+    {
+        return $this->document;
+    }
+
+    /**
+     * Set document.
+     *
+     * @param Document $document
+     *
+     * @return $this
+     */
+    public function setDocument($document)
+    {
+        $this->document = $document;
 
         return $this;
     }
@@ -67,5 +125,9 @@ class Term
         $this->frequency++;
 
         return $this;
+    }
+
+    public function addDocument($getId)
+    {
     }
 }

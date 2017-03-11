@@ -25,7 +25,8 @@
         "doctrine/doctrine-bundle": "^1.6",
         "doctrine/doctrine-cache-bundle": "^1.2",
         "pucene/pucene": "dev-master",
-        "pucene/core": "@dev"
+        "pucene/core": "@dev",
+        "beberlei/DoctrineExtensions": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.0"
@@ -41,4 +42,3 @@
         }
     }
 }
-

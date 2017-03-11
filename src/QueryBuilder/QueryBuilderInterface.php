@@ -7,5 +7,5 @@ use Pucene\Component\QueryBuilder\Query\QueryInterface;
 
 interface QueryBuilderInterface
 {
-    public function build(QueryInterface $query, QueryBuilder $queryBuilder);
+    public function build(QueryInterface $query, QueryBuilder $queryBuilder, ScoringQueryBuilder $scoringQueryBuilder);
 }

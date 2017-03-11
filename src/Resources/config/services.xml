@@ -23,6 +23,11 @@
 
             <argument type="string">PuceneDoctrineBundle:Term</argument>
         </service>
+        <service id="pucene_doctrine.repository.document_term" class="Pucene\Bundle\DoctrineBundle\Repository\BaseRepository">
+            <factory service="doctrine.orm.entity_manager" method="getRepository"/>
+
+            <argument type="string">PuceneDoctrineBundle:DocumentTerm</argument>
+        </service>
 
         <service id="pucene_doctrine.transaction_manager"
                  class="Pucene\Bundle\DoctrineBundle\Repository\TransactionManager">
@@ -40,17 +45,18 @@
             <argument type="service" id="pucene_doctrine.repository.document"/>
             <argument type="service" id="pucene_doctrine.repository.token"/>
             <argument type="service" id="pucene_doctrine.repository.term"/>
+            <argument type="service" id="pucene_doctrine.repository.document_term"/>
             <argument type="service" id="pucene_doctrine.search_executor"/>
         </service>
 
         <service id="pucene_doctrine.inverted_index" class="Pucene\InvertedIndex\InvertedIndex">
+            <argument type="service" id="pucene_doctrine.analyzer.standard"/>
             <argument type="service" id="pucene_doctrine.inverted_index.storage"/>
         </service>
 
         <service id="pucene_doctrine.analyzer.standard" class="Pucene\Analysis\StandardAnalyzer"/>
 
         <service id="pucene_doctrine.index_factory" class="Pucene\Index\IndexFactory">
-            <argument type="service" id="pucene_doctrine.analyzer.standard"/>
             <argument type="service" id="pucene_doctrine.inverted_index"/>
         </service>
 

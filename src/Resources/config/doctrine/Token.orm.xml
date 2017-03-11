@@ -20,13 +20,13 @@
 
         <many-to-one target-entity="Pucene\Bundle\DoctrineBundle\Entity\Term" field="term">
             <join-columns>
-                <join-column name="term_id" referenced-column-name="id" nullable="false"/>
+                <join-column name="term_id" nullable="false" referenced-column-name="term"/>
             </join-columns>
         </many-to-one>
 
         <many-to-one field="field" target-entity="Pucene\Bundle\DoctrineBundle\Entity\Field">
             <join-columns>
-                <join-column name="field_id" referenced-column-name="id" on-delete="CASCADE" nullable="false"/>
+                <join-column name="field_id" on-delete="CASCADE" nullable="false"/>
             </join-columns>
         </many-to-one>
     </entity>

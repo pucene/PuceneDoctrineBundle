@@ -2,6 +2,7 @@
 
 namespace Pucene\Bundle\DoctrineBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 /**
@@ -33,6 +34,17 @@ class Document
      * @var Collection
      */
     private $fields;
+
+    /**
+     * @var Collection
+     */
+    private $documentTerms;
+
+    public function __construct()
+    {
+        $this->fields = new ArrayCollection();
+        $this->documentTerms = new ArrayCollection();
+    }
 
     /**
      * Get id.
@@ -178,6 +190,30 @@ class Document
     public function removeField($field)
     {
         $this->fields->add($field);
+
+        return $this;
+    }
+
+    /**
+     * Returns documentTerms.
+     *
+     * @return Collection
+     */
+    public function getDocumentTerms()
+    {
+        return $this->documentTerms;
+    }
+
+    /**
+     * Set documentTerms.
+     *
+     * @param Collection $documentTerms
+     *
+     * @return $this
+     */
+    public function setDocumentTerms($documentTerms)
+    {
+        $this->documentTerms = $documentTerms;
 
         return $this;
     }

@@ -4,14 +4,14 @@ namespace Pucene\Bundle\DoctrineBundle\Repository;
 
 class TermRepository extends BaseRepository implements TermRepositoryInterface
 {
-    public function findTermOrCreate($term)
+    public function findOrCreate($id)
     {
-        $termEntity = $this->findOneBy(['term' => $term]);
-        if (!$termEntity) {
-            $termEntity = $this->create();
-            $termEntity->setTerm($term);
+        $entity = $this->find($id);
+        if (!$entity) {
+            $entity = $this->create();
+            $entity->setTerm($id);
         }
 
-        return $termEntity;
+        return $entity;
     }
 }

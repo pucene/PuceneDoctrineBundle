@@ -4,6 +4,9 @@ namespace Pucene\Bundle\DoctrineBundle\Storage;
 
 use Pucene\Analysis\Token;
 use Pucene\Bundle\DoctrineBundle\Entity\Document;
+use Pucene\Bundle\DoctrineBundle\Entity\DocumentTerm;
+use Pucene\Bundle\DoctrineBundle\Entity\Field;
+use Pucene\Bundle\DoctrineBundle\Entity\Term;
 use Pucene\Bundle\DoctrineBundle\Entity\Token as TokenEntity;
 use Pucene\Bundle\DoctrineBundle\QueryBuilder\SearchExecutor;
 use Pucene\Bundle\DoctrineBundle\Repository\DocumentRepositoryInterface;
@@ -42,6 +45,11 @@ class DoctrineStorage implements StorageInterface
     private $termRepository;
 
     /**
+     * @var RepositoryInterface
+     */
+    private $documentTermRepository;
+
+    /**
      * @var SearchExecutor
      */
     private $searchExecutor;
@@ -52,6 +60,7 @@ class DoctrineStorage implements StorageInterface
      * @param DocumentRepositoryInterface $documentRepository
      * @param RepositoryInterface $tokenRepository
      * @param TermRepositoryInterface $termRepository
+     * @param RepositoryInterface $documentTermRepository
      * @param SearchExecutor $searchExecutor
      */
     public function __construct(
@@ -60,6 +69,7 @@ class DoctrineStorage implements StorageInterface
         DocumentRepositoryInterface $documentRepository,
         RepositoryInterface $tokenRepository,
         TermRepositoryInterface $termRepository,
+        RepositoryInterface $documentTermRepository,
         SearchExecutor $searchExecutor
     ) {
         $this->transactionManager = $transactionManager;
@@ -67,13 +77,17 @@ class DoctrineStorage implements StorageInterface
         $this->documentRepository = $documentRepository;
         $this->tokenRepository = $tokenRepository;
         $this->termRepository = $termRepository;
+        $this->documentTermRepository = $documentTermRepository;
         $this->searchExecutor = $searchExecutor;
+    }
+
+    public function beginSave()
+    {
+        $this->transactionManager->start();
     }
 
     public function save(Token $token, array $document, $fieldName)
     {
-        $this->transactionManager->start();
-
         /** @var Document $documentEntity */
         $documentEntity = $this->documentRepository->findOrCreate(
             [
@@ -84,12 +98,23 @@ class DoctrineStorage implements StorageInterface
         $documentEntity->setType($document['_type']);
         $documentEntity->setData($document);
 
-        $field = $this->fieldRepository->findByDocument($documentEntity, $fieldName);
-        if (!$field) {
-            $field = $this->fieldRepository->createForDocument($documentEntity, $fieldName);
-        }
+        /** @var Field $field */
+        $field = $this->fieldRepository->findOrCreate($documentEntity->getId() . '-' . $fieldName);
+        $field->setName($fieldName);
+        $field->setDocument($documentEntity);
+        $field->increase();
 
-        $term = $this->termRepository->findTermOrCreate($token->getTerm());
+        /** @var Term $term */
+        $term = $this->termRepository->findOrCreate($token->getTerm());
+
+        // should only increase one per document
+        $term->increase();
+
+        /** @var DocumentTerm $termFrequency */
+        $termFrequency = $this->documentTermRepository->findOrCreate($documentEntity->getId() . '-' . $term->getTerm());
+        $termFrequency->setDocument($documentEntity);
+        $termFrequency->setTerm($term);
+        $termFrequency->increase();
 
         /** @var TokenEntity $tokenEntity */
         $tokenEntity = $this->tokenRepository->create();
@@ -104,16 +129,28 @@ class DoctrineStorage implements StorageInterface
         $this->transactionManager->add($field);
         $this->transactionManager->add($term);
         $this->transactionManager->add($tokenEntity);
+        $this->transactionManager->add($termFrequency);
+    }
+
+    public function endSave()
+    {
         $this->transactionManager->finish();
     }
 
     public function search(Search $search)
     {
+        $result = $this->searchExecutor->execute($search);
+
+        dump($result);
+
         return array_map(
-            function (Document $document) {
-                return $document->getData();
+            function ($document) {
+                $data = json_decode($document['data'], true);
+                $data['_scoring'] = $document['scoring'];
+
+                return $data;
             },
-            $this->searchExecutor->execute($search)
+            $result
         );
     }
 }

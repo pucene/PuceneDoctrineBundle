@@ -5,14 +5,10 @@
     <entity repository-class="Pucene\Bundle\DoctrineBundle\Repository\TermRepository"
             name="Pucene\Bundle\DoctrineBundle\Entity\Term"
             table="pu_term">
-        <indexes>
-            <index columns="term"/>
-        </indexes>
-
-        <id name="id" type="integer" column="id">
-            <generator strategy="AUTO"/>
+        <id name="term" type="string" column="term" length="255">
+            <generator strategy="NONE"/>
         </id>
 
-        <field name="term" type="string" length="255" column="term" nullable="false" unique="true"/>
+        <field name="frequency" type="integer" column="frequency"/>
     </entity>
 </doctrine-mapping>
