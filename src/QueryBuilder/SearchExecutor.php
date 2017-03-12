@@ -37,7 +37,7 @@ class SearchExecutor
     {
         $scoringQueryBuilder = $this->entityManager->createQueryBuilder();
 
-        $scoringQueryBuilder = new ScoringQueryBuilder($scoringQueryBuilder);
+        $scoringQueryBuilder = new ScoringQueryBuilder($this->entityManager, $scoringQueryBuilder);
 
         $queryBuilder = $this->entityManager->createQueryBuilder()
             ->distinct()
@@ -52,8 +52,6 @@ class SearchExecutor
         $query = $search->getQuery();
         $queryBuilder
             ->where($this->builders->get(get_class($query))->build($query, $queryBuilder, $scoringQueryBuilder));
-
-        dump($scoringQueryBuilder->getDQL());
 
         $queryBuilder->addSelect('(' . $scoringQueryBuilder->getDQL() . ') as scoring');
 

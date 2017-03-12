@@ -12,7 +12,7 @@
         <field name="frequency" type="integer" nullable="false"/>
 
         <many-to-one target-entity="Pucene\Bundle\DoctrineBundle\Entity\Document" field="document">
-            <join-column name="document_id" nullable="false"/>
+            <join-column name="document_id" nullable="false" on-delete="CASCADE"/>
         </many-to-one>
 
         <many-to-one target-entity="Pucene\Bundle\DoctrineBundle\Entity\Term" field="term">

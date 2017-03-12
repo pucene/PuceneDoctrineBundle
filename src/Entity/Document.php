@@ -23,11 +23,6 @@ class Document
     /**
      * @var string
      */
-    private $indexName;
-
-    /**
-     * @var string
-     */
     private $data;
 
     /**
@@ -66,30 +61,6 @@ class Document
     public function setId($id)
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * Returns index-name.
-     *
-     * @return string
-     */
-    public function getIndexName()
-    {
-        return $this->indexName;
-    }
-
-    /**
-     * Set index-name.
-     *
-     * @param string $indexName
-     *
-     * @return $this
-     */
-    public function setIndexName($indexName)
-    {
-        $this->indexName = $indexName;
 
         return $this;
     }

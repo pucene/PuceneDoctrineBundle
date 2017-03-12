@@ -38,6 +38,8 @@ class TransactionManager
             $this->rollback();
 
             throw $e;
+        } finally {
+            $this->entityManager->clear();
         }
     }
 

@@ -10,11 +10,6 @@ class Term
     private $term;
 
     /**
-     * @var int
-     */
-    private $frequency = 0;
-
-    /**
      * Returns term.
      *
      * @return string
@@ -34,37 +29,6 @@ class Term
     public function setTerm($term)
     {
         $this->term = $term;
-
-        return $this;
-    }
-
-    /**
-     * Returns frequency.
-     *
-     * @return int
-     */
-    public function getFrequency()
-    {
-        return $this->frequency;
-    }
-
-    /**
-     * Set frequency.
-     *
-     * @param int $frequency
-     *
-     * @return $this
-     */
-    public function setFrequency($frequency)
-    {
-        $this->frequency = $frequency;
-
-        return $this;
-    }
-
-    public function increase()
-    {
-        $this->frequency++;
 
         return $this;
     }

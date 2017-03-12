@@ -31,4 +31,14 @@ class BaseRepository extends EntityRepository implements RepositoryInterface
     {
         return new $this->_entityName();
     }
+
+    public function remove($id)
+    {
+        $entity = $this->find($id);
+        if (!$entity) {
+            return;
+        }
+
+        $this->_em->remove($entity);
+    }
 }

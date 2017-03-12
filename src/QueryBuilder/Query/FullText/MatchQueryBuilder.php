@@ -41,11 +41,19 @@ class MatchQueryBuilder implements QueryBuilderInterface
     public function build(QueryInterface $query, QueryBuilder $queryBuilder, ScoringQueryBuilder $scoringQueryBuilder)
     {
         $tokens = $this->analyzer->analyze($query->getQuery());
+        $length = count($tokens);
 
         $scoringQueryBuilder->open();
 
         $or = $queryBuilder->expr()->orX();
-        foreach ($tokens as $token) {
+        foreach ($tokens as $index => $token) {
+            $scoringQueryBuilder->open();
+
+            $scoringQueryBuilder->queryNorm($tokens);
+            $scoringQueryBuilder->multiply();
+            $scoringQueryBuilder->inverseDocumentFrequency($token->getTerm());
+            $scoringQueryBuilder->multiply();
+
             $scoringQueryBuilder->open();
 
             $or->add(
@@ -57,6 +65,11 @@ class MatchQueryBuilder implements QueryBuilderInterface
             );
 
             $scoringQueryBuilder->close();
+            $scoringQueryBuilder->close();
+
+            if ($index != $length - 1) {
+                $scoringQueryBuilder->addition();
+            }
         }
 
         $scoringQueryBuilder->close();

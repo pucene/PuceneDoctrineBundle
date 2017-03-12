@@ -2,12 +2,18 @@
 
 namespace Pucene\Bundle\DoctrineBundle\QueryBuilder;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Pucene\Bundle\DoctrineBundle\Entity\Document;
 
 class ScoringQueryBuilder
 {
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
     /**
      * @var QueryBuilder
      */
@@ -24,14 +30,25 @@ class ScoringQueryBuilder
     private $joins = [];
 
     /**
+     * @var int
+     */
+    private $docCount;
+
+    /**
+     * @var int[]
+     */
+    private $docCountPerTerm = [];
+
+    /**
+     * @param EntityManagerInterface $entityManager
      * @param QueryBuilder $queryBuilder
      */
-    public function __construct(QueryBuilder $queryBuilder)
+    public function __construct(EntityManagerInterface $entityManager, QueryBuilder $queryBuilder)
     {
+        $this->entityManager = $entityManager;
         $this->queryBuilder = $queryBuilder;
+
         $this->queryBuilder->from(Document::class, 'innerDocument')
-            ->distinct()
-            ->from(Document::class, 'allDocument')
             ->where('innerDocument.id = document.id')
             ->setMaxResults(1);
     }
@@ -46,23 +63,39 @@ class ScoringQueryBuilder
         $this->parts[] = '*';
     }
 
+    public function addition()
+    {
+        $this->parts[] = '+';
+    }
+
+    public function queryNorm(array $tokens)
+    {
+        $sum = 0;
+        foreach ($tokens as $token) {
+            $sum += pow($this->calculateInverseDocumentFrequency($token->getTerm()), 2);
+        }
+
+        $this->parts[] = (1.0 / sqrt($sum));
+    }
+
     public function termFrequency($term)
     {
-        $this->parts[] = 'SQRT(' . $this->joinTerm($term) . '.frequency)';
+        $this->parts[] = 'COALESCE(SQRT(' . $this->joinTerm($term) . '.frequency),0)';
     }
 
     public function inverseDocumentFrequency($term)
     {
-        // FIXME numDoc count of documents in index
-        // FIXME docFreq cound of documents which contains term
+        $this->parts[] = $this->calculateInverseDocumentFrequency($term);
+    }
 
-        $this->parts[] = '(1+LOG10(COUNT(allDocument.id)/(' . $this->joinTerm($term) . '.frequency+1)))';
-        // $this->parts[] = '1';
+    private function calculateInverseDocumentFrequency($term)
+    {
+        return 1 + log((float) $this->getDocCount() / (float) ($this->getDocCountPerTerm($term) + 1));
     }
 
     public function fieldLengthNorm($field)
     {
-        $this->parts[] = '(1/SQRT(' . $this->joinField($field) . '.numTerms))';
+        $this->parts[] = 'COALESCE((1/SQRT(' . $this->joinField($field) . '.numTerms)),0)';
     }
 
     public function close()
@@ -76,7 +109,7 @@ class ScoringQueryBuilder
             $this->parts[] = '1';
         }
 
-        $this->queryBuilder->select(join(' ', $this->parts));
+        $this->queryBuilder->select(implode(' ', $this->parts));
 
         $dql = $this->queryBuilder->getQuery()->getDQL();
 
@@ -85,57 +118,57 @@ class ScoringQueryBuilder
 
     private function joinTerm($term)
     {
-        $termName = 'field' . ucFirst($term);
+        $termName = 'field' . ucfirst($term);
         if (in_array($termName, $this->joins)) {
             return $termName;
         }
 
-        $this->queryBuilder->join(
-            'innerDocument.documentTerms',
-            $termName,
-            Join::WITH,
-            $termName . '.term = \'' . $term . '\''
-        );
+        $this->queryBuilder
+            ->leftJoin('innerDocument.documentTerms', $termName, Join::WITH, $termName . '.term = \'' . $term . '\'');
 
         return $this->joins[] = $termName;
     }
 
     private function joinField($field)
     {
-        $fieldName = 'field' . ucFirst($field);
+        $fieldName = 'field' . ucfirst($field);
         if (in_array($fieldName, $this->joins)) {
             return $fieldName;
         }
 
-        $this->queryBuilder->join(
-            'innerDocument.fields',
-            $fieldName,
-            Join::WITH,
-            $fieldName . '.name = \'' . $field . '\''
-        );
+        $this->queryBuilder
+            ->leftJoin('innerDocument.fields', $fieldName, Join::WITH, $fieldName . '.name = \'' . $field . '\'');
 
         return $this->joins[] = $fieldName;
     }
+
+    private function getDocCount()
+    {
+        if ($this->docCount) {
+            return $this->docCount;
+        }
+
+        $queryBuilder = $this->entityManager->createQueryBuilder()->select('COUNT(document.id)')->from(
+            Document::class,
+            'document'
+        );
+
+        return $this->docCount = (int) $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    private function getDocCountPerTerm($term)
+    {
+        if (array_key_exists($term, $this->docCountPerTerm)) {
+            return $this->docCountPerTerm[$term];
+        }
+
+        $queryBuilder = $this->entityManager->createQueryBuilder()
+            ->select('COUNT(document.id)')
+            ->from(Document::class, 'document')
+            ->leftJoin('document.documentTerms', 'documentTerm')
+            ->leftJoin('documentTerm.term', 'term', Join::WITH, 'term.term = :term')
+            ->setParameter('term', $term);
+
+        return $this->docCountPerTerm[$term] = (int) $queryBuilder->getQuery()->getSingleScalarResult();
+    }
 }
-
-/*
-SELECT 1 AS sclr_2 FROM pu_document p1_, pu_document p2_ WHERE p1_.id = '13627fd4-f777-414b-84ea-c5caea95aedb';
-
-SELECT ((SQRT(p0_.frequency) * (1 + LOG(COUNT(p1_.id) / (p0_.frequency + 1))) * (1 / SQRT(p2_.numTerms)))) AS sclr_0
-FROM pu_document p3_
-	INNER JOIN pu_document_term p0_ ON p3_.id = p0_.document_id AND (p0_.term = 'geschenkten')
-	INNER JOIN pu_field p2_ ON p3_.id = p2_.document_id AND (p2_.name = 'title'),
-	pu_document p1_
-WHERE p3_.id = '13627fd4-f777-414b-84ea-c5caea95aedb'
-LIMIT 1;
-
-SELECT SQRT(p0_.frequency) as termFrequency,
-	   (1 + LOG(COUNT(p1_.id) / (p0_.frequency + 1))) as inversedDocumentFrequency,
-	   (1 / SQRT(p2_.numTerms)) as fieldLengthNorm
-FROM pu_document p3_
-	INNER JOIN pu_document_term p0_ ON p3_.id = p0_.document_id AND (p0_.term = 'geschenkten')
-	INNER JOIN pu_field p2_ ON p3_.id = p2_.document_id AND (p2_.name = 'title'),
-	pu_document p1_
-WHERE p3_.id = '13627fd4-f777-414b-84ea-c5caea95aedb'
-LIMIT 1;
- */

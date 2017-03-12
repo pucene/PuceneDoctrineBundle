@@ -81,7 +81,7 @@ class DoctrineStorage implements StorageInterface
         $this->searchExecutor = $searchExecutor;
     }
 
-    public function beginSave()
+    public function beginSaveDocument()
     {
         $this->transactionManager->start();
     }
@@ -89,12 +89,7 @@ class DoctrineStorage implements StorageInterface
     public function save(Token $token, array $document, $fieldName)
     {
         /** @var Document $documentEntity */
-        $documentEntity = $this->documentRepository->findOrCreate(
-            [
-                'indexName' => $document['_index'],
-                'id' => $document['_id'],
-            ]
-        );
+        $documentEntity = $this->documentRepository->findOrCreate($document['_id']);
         $documentEntity->setType($document['_type']);
         $documentEntity->setData($document);
 
@@ -106,9 +101,6 @@ class DoctrineStorage implements StorageInterface
 
         /** @var Term $term */
         $term = $this->termRepository->findOrCreate($token->getTerm());
-
-        // should only increase one per document
-        $term->increase();
 
         /** @var DocumentTerm $termFrequency */
         $termFrequency = $this->documentTermRepository->findOrCreate($documentEntity->getId() . '-' . $term->getTerm());
@@ -132,7 +124,7 @@ class DoctrineStorage implements StorageInterface
         $this->transactionManager->add($termFrequency);
     }
 
-    public function endSave()
+    public function finishSaveDocument()
     {
         $this->transactionManager->finish();
     }
@@ -140,8 +132,6 @@ class DoctrineStorage implements StorageInterface
     public function search(Search $search)
     {
         $result = $this->searchExecutor->execute($search);
-
-        dump($result);
 
         return array_map(
             function ($document) {
@@ -152,5 +142,12 @@ class DoctrineStorage implements StorageInterface
             },
             $result
         );
+    }
+
+    public function remove($id)
+    {
+        $this->transactionManager->start();
+        $this->documentRepository->remove($id);
+        $this->transactionManager->finish();
     }
 }

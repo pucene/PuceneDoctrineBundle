@@ -8,7 +8,5 @@
         <id name="term" type="string" column="term" length="255">
             <generator strategy="NONE"/>
         </id>
-
-        <field name="frequency" type="integer" column="frequency"/>
     </entity>
 </doctrine-mapping>

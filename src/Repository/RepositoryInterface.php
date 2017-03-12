@@ -9,4 +9,6 @@ interface RepositoryInterface
     public function findOrCreate($id);
 
     public function create();
+
+    public function remove($id);
 }

@@ -122,7 +122,7 @@ class DocumentTerm
 
     public function increase()
     {
-        $this->frequency++;
+        ++$this->frequency;
 
         return $this;
     }

@@ -190,7 +190,7 @@ class Field
 
     public function increase()
     {
-        $this->numTerms++;
+        ++$this->numTerms;
 
         return $this;
     }
