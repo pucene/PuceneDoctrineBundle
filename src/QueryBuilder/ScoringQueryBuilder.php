@@ -5,7 +5,9 @@ namespace Pucene\Bundle\DoctrineBundle\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use Pucene\Analysis\Token;
 use Pucene\Bundle\DoctrineBundle\Entity\Document;
+use Pucene\Bundle\DoctrineBundle\Entity\DocumentTerm;
 
 class ScoringQueryBuilder
 {
@@ -70,9 +72,16 @@ class ScoringQueryBuilder
 
     public function queryNorm(array $tokens)
     {
+        $terms = array_map(
+            function (Token $token) {
+                return $token->getTerm();
+            },
+            $tokens
+        );
+
         $sum = 0;
-        foreach ($tokens as $token) {
-            $sum += pow($this->calculateInverseDocumentFrequency($token->getTerm()), 2);
+        foreach ($this->getDocCountPerTerms($terms) as $term => $value) {
+            $sum += pow($value, 2);
         }
 
         $this->parts[] = (1.0 / sqrt($sum));
@@ -170,5 +179,28 @@ class ScoringQueryBuilder
             ->setParameter('term', $term);
 
         return $this->docCountPerTerm[$term] = (int) $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    private function getDocCountPerTerms(array $terms)
+    {
+        // TODO reuse doc-counts.
+
+        $queryBuilder = $this->entityManager->createQueryBuilder()
+            ->select('COUNT(document.id)')
+            ->addSelect('term.term')
+            ->from(DocumentTerm::class, 'documentTerm')
+            ->leftJoin('documentTerm.document', 'document')
+            ->leftJoin('documentTerm.term', 'term')
+            ->where('term.term IN (:terms)')
+            ->groupBy('term.term')
+            ->setParameter('terms', $terms);
+
+        $result = [];
+        foreach ($queryBuilder->getQuery()->getArrayResult() as $item) {
+            $result[$item['term']] = $item[1];
+            $this->docCountPerTerm[$item['term']] = $item[1];
+        }
+
+        return $result;
     }
 }

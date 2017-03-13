@@ -46,6 +46,7 @@ class SearchExecutor
             ->innerJoin('document.fields', 'field')
             ->innerJoin('field.tokens', 'token')
             ->innerJoin('token.term', 'term')
+            ->orderBy('scoring', 'DESC')
             ->setMaxResults($search->getSize())
             ->setFirstResult($search->getFrom());
 
