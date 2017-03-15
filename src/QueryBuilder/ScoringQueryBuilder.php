@@ -81,25 +81,35 @@ class ScoringQueryBuilder
 
         $sum = 0;
         foreach ($this->getDocCountPerTerms($terms) as $term => $value) {
-            $sum += pow($value, 2);
+            $sum += pow($this->calculateInverseDocumentFrequency($value), 2);
         }
 
         $this->parts[] = (1.0 / sqrt($sum));
     }
 
-    public function termFrequency($term)
+    public function coord($field, array $tokens)
     {
-        $this->parts[] = 'COALESCE(SQRT(' . $this->joinTerm($term) . '.frequency),0)';
+        $sum = [];
+        foreach ($tokens as $token) {
+            $sum[] = 'COUNT(' . $this->joinTerm($field, $token->getTerm()) . ')';
+        }
+
+        $this->parts[] = '((' . implode('+', $sum) . ')/' . count($tokens) . ')';
+    }
+
+    public function termFrequency($field, $term)
+    {
+        $this->parts[] = 'COALESCE(SQRT(COUNT(' . $this->joinTerm($field, $term) . '.id)),0)';
     }
 
     public function inverseDocumentFrequency($term)
     {
-        $this->parts[] = $this->calculateInverseDocumentFrequency($term);
+        $this->parts[] = $this->calculateInverseDocumentFrequency($this->getDocCountPerTerm($term));
     }
 
-    private function calculateInverseDocumentFrequency($term)
+    private function calculateInverseDocumentFrequency($docCount)
     {
-        return 1 + log((float) $this->getDocCount() / (float) ($this->getDocCountPerTerm($term) + 1));
+        return 1 + log((float)$this->getDocCount() / ($docCount + 1));
     }
 
     public function fieldLengthNorm($field)
@@ -125,15 +135,19 @@ class ScoringQueryBuilder
         return $dql;
     }
 
-    private function joinTerm($term)
+    private function joinTerm($field, $term)
     {
         $termName = 'field' . ucfirst($term);
         if (in_array($termName, $this->joins)) {
             return $termName;
         }
 
-        $this->queryBuilder
-            ->leftJoin('innerDocument.documentTerms', $termName, Join::WITH, $termName . '.term = \'' . $term . '\'');
+        $this->queryBuilder->leftJoin(
+            $this->joinField($field) . '.fieldTerms',
+            $termName,
+            Join::WITH,
+            $termName . '.term = \'' . $term . '\''
+        );
 
         return $this->joins[] = $termName;
     }

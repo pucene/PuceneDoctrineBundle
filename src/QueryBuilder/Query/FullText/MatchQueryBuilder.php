@@ -53,6 +53,8 @@ class MatchQueryBuilder implements QueryBuilderInterface
             $scoringQueryBuilder->multiply();
             $scoringQueryBuilder->inverseDocumentFrequency($token->getTerm());
             $scoringQueryBuilder->multiply();
+            $scoringQueryBuilder->coord($query->getField(), $tokens);
+            $scoringQueryBuilder->multiply();
 
             $scoringQueryBuilder->open();
 

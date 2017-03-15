@@ -28,6 +28,11 @@
 
             <argument type="string">PuceneDoctrineBundle:DocumentTerm</argument>
         </service>
+        <service id="pucene_doctrine.repository.field_term" class="Pucene\Bundle\DoctrineBundle\Repository\BaseRepository">
+            <factory service="doctrine.orm.entity_manager" method="getRepository"/>
+
+            <argument type="string">PuceneDoctrineBundle:FieldTerm</argument>
+        </service>
 
         <service id="pucene_doctrine.transaction_manager"
                  class="Pucene\Bundle\DoctrineBundle\Repository\TransactionManager">
@@ -46,6 +51,7 @@
             <argument type="service" id="pucene_doctrine.repository.token"/>
             <argument type="service" id="pucene_doctrine.repository.term"/>
             <argument type="service" id="pucene_doctrine.repository.document_term"/>
+            <argument type="service" id="pucene_doctrine.repository.field_term"/>
             <argument type="service" id="pucene_doctrine.search_executor"/>
         </service>
 

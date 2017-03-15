@@ -31,6 +31,11 @@ class Field
     private $tokens;
 
     /**
+     * @var Collection
+     */
+    private $fieldTerms;
+
+    /**
      * @var int
      */
     private $numTerms = 0;
@@ -38,6 +43,7 @@ class Field
     public function __construct()
     {
         $this->tokens = new ArrayCollection();
+        $this->fieldTerms = new ArrayCollection();
     }
 
     /**
@@ -191,6 +197,30 @@ class Field
     public function increase()
     {
         ++$this->numTerms;
+
+        return $this;
+    }
+
+    /**
+     * Returns fieldTerms.
+     *
+     * @return Collection
+     */
+    public function getFieldTerms()
+    {
+        return $this->fieldTerms;
+    }
+
+    /**
+     * Set fieldTerms.
+     *
+     * @param Collection $fieldTerms
+     *
+     * @return $this
+     */
+    public function setFieldTerms($fieldTerms)
+    {
+        $this->fieldTerms = $fieldTerms;
 
         return $this;
     }

@@ -19,7 +19,7 @@ class TermQueryBuilder implements QueryBuilderInterface
      */
     public function build(QueryInterface $query, QueryBuilder $queryBuilder, ScoringQueryBuilder $scoringQueryBuilder)
     {
-        $scoringQueryBuilder->termFrequency($query->getTerm());
+        $scoringQueryBuilder->termFrequency($query->getField(), $query->getTerm());
         $scoringQueryBuilder->multiply();
         $scoringQueryBuilder->inverseDocumentFrequency($query->getTerm());
         $scoringQueryBuilder->multiply();

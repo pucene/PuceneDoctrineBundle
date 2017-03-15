@@ -2,7 +2,10 @@
 
 namespace Pucene\Bundle\DoctrineBundle\Entity;
 
-class DocumentTerm
+/**
+ * TODO add description here
+ */
+class FieldTerm
 {
     /**
      * @var string
@@ -15,9 +18,9 @@ class DocumentTerm
     private $term;
 
     /**
-     * @var Document
+     * @var Field
      */
-    private $document;
+    private $field;
 
     /**
      * @var int
@@ -73,25 +76,25 @@ class DocumentTerm
     }
 
     /**
-     * Returns document.
+     * Returns field.
      *
-     * @return Document
+     * @return Field
      */
-    public function getDocument()
+    public function getField()
     {
-        return $this->document;
+        return $this->field;
     }
 
     /**
-     * Set document.
+     * Set field.
      *
-     * @param Document $document
+     * @param Field $field
      *
      * @return $this
      */
-    public function setDocument($document)
+    public function setField($field)
     {
-        $this->document = $document;
+        $this->field = $field;
 
         return $this;
     }

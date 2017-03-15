@@ -12,6 +12,10 @@
         <field name="name" type="string" column="name" length="255"/>
         <field name="numTerms" type="integer" column="numTerms"/>
 
+        <one-to-many field="fieldTerms"
+                     target-entity="Pucene\Bundle\DoctrineBundle\Entity\FieldTerm"
+                     mapped-by="field"/>
+
         <one-to-many field="tokens"
                      target-entity="Pucene\Bundle\DoctrineBundle\Entity\Token"
                      mapped-by="field"
