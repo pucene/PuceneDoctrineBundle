@@ -3,7 +3,7 @@
 namespace Pucene\Bundle\DoctrineBundle\Entity;
 
 /**
- * TODO add description here
+ * Contains statistic between field and term.
  */
 class FieldTerm
 {

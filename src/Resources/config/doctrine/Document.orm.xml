@@ -14,10 +14,14 @@
 
         <one-to-many field="fields"
                      target-entity="Pucene\Bundle\DoctrineBundle\Entity\Field"
-                     mapped-by="document"/>
+                     mapped-by="document">
+            <cascade><cascade-remove/></cascade>
+        </one-to-many>
 
         <one-to-many field="documentTerms"
                      target-entity="Pucene\Bundle\DoctrineBundle\Entity\DocumentTerm"
-                     mapped-by="document"/>
+                     mapped-by="document">
+            <cascade><cascade-remove/></cascade>
+        </one-to-many>
     </entity>
 </doctrine-mapping>

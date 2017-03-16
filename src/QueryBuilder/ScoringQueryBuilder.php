@@ -109,7 +109,7 @@ class ScoringQueryBuilder
 
     private function calculateInverseDocumentFrequency($docCount)
     {
-        return 1 + log((float)$this->getDocCount() / ($docCount + 1));
+        return 1 + log((float) $this->getDocCount() / ($docCount + 1));
     }
 
     public function fieldLengthNorm($field)
@@ -159,8 +159,12 @@ class ScoringQueryBuilder
             return $fieldName;
         }
 
-        $this->queryBuilder
-            ->leftJoin('innerDocument.fields', $fieldName, Join::WITH, $fieldName . '.name = \'' . $field . '\'');
+        $this->queryBuilder->leftJoin(
+                'innerDocument.fields',
+                $fieldName,
+                Join::WITH,
+                $fieldName . '.name = \'' . $field . '\''
+            );
 
         return $this->joins[] = $fieldName;
     }
@@ -185,12 +189,15 @@ class ScoringQueryBuilder
             return $this->docCountPerTerm[$term];
         }
 
-        $queryBuilder = $this->entityManager->createQueryBuilder()
-            ->select('COUNT(document.id)')
-            ->from(Document::class, 'document')
-            ->leftJoin('document.documentTerms', 'documentTerm')
-            ->leftJoin('documentTerm.term', 'term', Join::WITH, 'term.term = :term')
-            ->setParameter('term', $term);
+        $queryBuilder = $this->entityManager->createQueryBuilder()->select('COUNT(document.id)')->from(
+                Document::class,
+                'document'
+            )->leftJoin('document.documentTerms', 'documentTerm')->leftJoin(
+                'documentTerm.term',
+                'term',
+                Join::WITH,
+                'term.term = :term'
+            )->setParameter('term', $term);
 
         return $this->docCountPerTerm[$term] = (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
