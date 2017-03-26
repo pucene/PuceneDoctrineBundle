@@ -2,6 +2,7 @@
 
 namespace Pucene\Bundle\DoctrineBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 /**
@@ -22,17 +23,23 @@ class Document
     /**
      * @var string
      */
-    private $indexName;
-
-    /**
-     * @var string
-     */
     private $data;
 
     /**
      * @var Collection
      */
     private $fields;
+
+    /**
+     * @var Collection
+     */
+    private $documentTerms;
+
+    public function __construct()
+    {
+        $this->fields = new ArrayCollection();
+        $this->documentTerms = new ArrayCollection();
+    }
 
     /**
      * Get id.
@@ -54,30 +61,6 @@ class Document
     public function setId($id)
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * Returns index-name.
-     *
-     * @return string
-     */
-    public function getIndexName()
-    {
-        return $this->indexName;
-    }
-
-    /**
-     * Set index-name.
-     *
-     * @param string $indexName
-     *
-     * @return $this
-     */
-    public function setIndexName($indexName)
-    {
-        $this->indexName = $indexName;
 
         return $this;
     }
@@ -178,6 +161,30 @@ class Document
     public function removeField($field)
     {
         $this->fields->add($field);
+
+        return $this;
+    }
+
+    /**
+     * Returns documentTerms.
+     *
+     * @return Collection
+     */
+    public function getDocumentTerms()
+    {
+        return $this->documentTerms;
+    }
+
+    /**
+     * Set documentTerms.
+     *
+     * @param Collection $documentTerms
+     *
+     * @return $this
+     */
+    public function setDocumentTerms($documentTerms)
+    {
+        $this->documentTerms = $documentTerms;
 
         return $this;
     }

@@ -4,6 +4,10 @@ namespace Pucene\Bundle\DoctrineBundle\Storage;
 
 use Pucene\Analysis\Token;
 use Pucene\Bundle\DoctrineBundle\Entity\Document;
+use Pucene\Bundle\DoctrineBundle\Entity\DocumentTerm;
+use Pucene\Bundle\DoctrineBundle\Entity\Field;
+use Pucene\Bundle\DoctrineBundle\Entity\FieldTerm;
+use Pucene\Bundle\DoctrineBundle\Entity\Term;
 use Pucene\Bundle\DoctrineBundle\Entity\Token as TokenEntity;
 use Pucene\Bundle\DoctrineBundle\QueryBuilder\SearchExecutor;
 use Pucene\Bundle\DoctrineBundle\Repository\DocumentRepositoryInterface;
@@ -42,6 +46,16 @@ class DoctrineStorage implements StorageInterface
     private $termRepository;
 
     /**
+     * @var RepositoryInterface
+     */
+    private $documentTermRepository;
+
+    /**
+     * @var RepositoryInterface
+     */
+    private $fieldTermRepository;
+
+    /**
      * @var SearchExecutor
      */
     private $searchExecutor;
@@ -52,6 +66,8 @@ class DoctrineStorage implements StorageInterface
      * @param DocumentRepositoryInterface $documentRepository
      * @param RepositoryInterface $tokenRepository
      * @param TermRepositoryInterface $termRepository
+     * @param RepositoryInterface $documentTermRepository
+     * @param RepositoryInterface $fieldTermRepository
      * @param SearchExecutor $searchExecutor
      */
     public function __construct(
@@ -60,6 +76,8 @@ class DoctrineStorage implements StorageInterface
         DocumentRepositoryInterface $documentRepository,
         RepositoryInterface $tokenRepository,
         TermRepositoryInterface $termRepository,
+        RepositoryInterface $documentTermRepository,
+        RepositoryInterface $fieldTermRepository,
         SearchExecutor $searchExecutor
     ) {
         $this->transactionManager = $transactionManager;
@@ -67,29 +85,47 @@ class DoctrineStorage implements StorageInterface
         $this->documentRepository = $documentRepository;
         $this->tokenRepository = $tokenRepository;
         $this->termRepository = $termRepository;
+        $this->documentTermRepository = $documentTermRepository;
+        $this->fieldTermRepository = $fieldTermRepository;
         $this->searchExecutor = $searchExecutor;
+    }
+
+    public function beginSaveDocument()
+    {
+        $this->transactionManager->start();
     }
 
     public function save(Token $token, array $document, $fieldName)
     {
-        $this->transactionManager->start();
-
         /** @var Document $documentEntity */
-        $documentEntity = $this->documentRepository->findOrCreate(
-            [
-                'indexName' => $document['_index'],
-                'id' => $document['_id'],
-            ]
-        );
+        $documentEntity = $this->documentRepository->findOrCreate($document['_id']);
         $documentEntity->setType($document['_type']);
         $documentEntity->setData($document);
 
-        $field = $this->fieldRepository->findByDocument($documentEntity, $fieldName);
-        if (!$field) {
-            $field = $this->fieldRepository->createForDocument($documentEntity, $fieldName);
-        }
+        /** @var Field $field */
+        $field = $this->fieldRepository->findOrCreate($documentEntity->getId() . '-' . $fieldName);
+        $field->setName($fieldName);
+        $field->setDocument($documentEntity);
+        $field->increase();
 
-        $term = $this->termRepository->findTermOrCreate($token->getTerm());
+        /** @var Term $term */
+        $term = $this->termRepository->findOrCreate($token->getTerm());
+
+        /** @var DocumentTerm $documentTermFrequency */
+        $documentTermFrequency = $this->documentTermRepository->findOrCreate(
+            $documentEntity->getId() . '-' . $term->getTerm()
+        );
+        $documentTermFrequency->setDocument($documentEntity);
+        $documentTermFrequency->setTerm($term);
+        $documentTermFrequency->increase();
+
+        /** @var FieldTerm $fieldTermFrequency */
+        $fieldTermFrequency = $this->fieldTermRepository->findOrCreate(
+            $field->getId() . '-' . $term->getTerm()
+        );
+        $fieldTermFrequency->setField($field);
+        $fieldTermFrequency->setTerm($term);
+        $fieldTermFrequency->increase();
 
         /** @var TokenEntity $tokenEntity */
         $tokenEntity = $this->tokenRepository->create();
@@ -104,16 +140,45 @@ class DoctrineStorage implements StorageInterface
         $this->transactionManager->add($field);
         $this->transactionManager->add($term);
         $this->transactionManager->add($tokenEntity);
+        $this->transactionManager->add($documentTermFrequency);
+        $this->transactionManager->add($fieldTermFrequency);
+    }
+
+    public function finishSaveDocument()
+    {
         $this->transactionManager->finish();
     }
 
     public function search(Search $search)
     {
-        return array_map(
-            function (Document $document) {
-                return $document->getData();
+        $result = $this->searchExecutor->execute($search);
+        $maxScore = 0;
+
+        $hits = array_map(
+            function ($document) use (&$maxScore) {
+                if ($document['scoring'] > $maxScore) {
+                    $maxScore = $document['scoring'];
+                }
+
+                $data = json_decode($document['data'], true);
+                $data['_score'] = $document['scoring'];
+
+                return $data;
             },
-            $this->searchExecutor->execute($search)
+            $result
         );
+
+        return [
+            'total' => 0, // TODO
+            'max_score' => $maxScore,
+            'hits' => $hits,
+        ];
+    }
+
+    public function remove($id)
+    {
+        $this->transactionManager->start();
+        $this->documentRepository->remove($id);
+        $this->transactionManager->finish();
     }
 }

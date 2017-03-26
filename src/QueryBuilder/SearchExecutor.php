@@ -35,18 +35,27 @@ class SearchExecutor
      */
     public function execute(PuceneSearch $search)
     {
-        $ormQueryBuilder = $this->entityManager->createQueryBuilder()
+        $scoringQueryBuilder = $this->entityManager->createQueryBuilder();
+
+        $scoringQueryBuilder = new ScoringQueryBuilder($this->entityManager, $scoringQueryBuilder);
+
+        $queryBuilder = $this->entityManager->createQueryBuilder()
+            ->distinct()
             ->from(Document::class, 'document')
-            ->select('document')
+            ->select('document.data')
             ->innerJoin('document.fields', 'field')
             ->innerJoin('field.tokens', 'token')
             ->innerJoin('token.term', 'term')
+            ->orderBy('scoring', 'DESC')
             ->setMaxResults($search->getSize())
             ->setFirstResult($search->getFrom());
 
         $query = $search->getQuery();
-        $ormQueryBuilder->where($this->builders->get(get_class($query))->build($query, $ormQueryBuilder));
+        $queryBuilder
+            ->where($this->builders->get(get_class($query))->build($query, $queryBuilder, $scoringQueryBuilder));
 
-        return $ormQueryBuilder->getQuery()->getResult();
+        $queryBuilder->addSelect('(' . $scoringQueryBuilder->getDQL() . ') as scoring');
+
+        return $queryBuilder->getQuery()->getResult();
     }
 }

@@ -8,9 +8,6 @@
         <id name="id" type="string" column="id">
             <generator strategy="NONE"/>
         </id>
-        <id name="indexName" type="string" column="indexName">
-            <generator strategy="NONE"/>
-        </id>
 
         <field name="type" type="string" column="type" length="255" nullable="false"/>
         <field name="data" type="json_array" column="data" nullable="false"/>
@@ -18,9 +15,13 @@
         <one-to-many field="fields"
                      target-entity="Pucene\Bundle\DoctrineBundle\Entity\Field"
                      mapped-by="document">
-            <cascade>
-                <cascade-remove />
-            </cascade>
+            <cascade><cascade-remove/></cascade>
+        </one-to-many>
+
+        <one-to-many field="documentTerms"
+                     target-entity="Pucene\Bundle\DoctrineBundle\Entity\DocumentTerm"
+                     mapped-by="document">
+            <cascade><cascade-remove/></cascade>
         </one-to-many>
     </entity>
 </doctrine-mapping>

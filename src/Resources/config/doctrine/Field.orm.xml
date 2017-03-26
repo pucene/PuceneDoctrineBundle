@@ -5,11 +5,16 @@
     <entity repository-class="Pucene\Bundle\DoctrineBundle\Repository\FieldRepository"
             name="Pucene\Bundle\DoctrineBundle\Entity\Field"
             table="pu_field">
-        <id name="id" type="integer" column="id">
-            <generator strategy="AUTO"/>
+        <id name="id" type="string" column="id">
+            <generator strategy="NONE"/>
         </id>
 
         <field name="name" type="string" column="name" length="255"/>
+        <field name="numTerms" type="integer" column="numTerms"/>
+
+        <one-to-many field="fieldTerms"
+                     target-entity="Pucene\Bundle\DoctrineBundle\Entity\FieldTerm"
+                     mapped-by="field"/>
 
         <one-to-many field="tokens"
                      target-entity="Pucene\Bundle\DoctrineBundle\Entity\Token"
@@ -22,7 +27,7 @@
 
         <many-to-one field="document" target-entity="Pucene\Bundle\DoctrineBundle\Entity\Document">
             <join-columns>
-                <join-column name="document_id" referenced-column-name="id" on-delete="CASCADE" nullable="false"/>
+                <join-column name="document_id" nullable="false" on-delete="CASCADE"/>
             </join-columns>
         </many-to-one>
     </entity>

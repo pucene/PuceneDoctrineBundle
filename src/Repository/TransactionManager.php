@@ -31,8 +31,16 @@ class TransactionManager
 
     public function finish()
     {
-        $this->entityManager->flush();
-        $this->entityManager->commit();
+        try {
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+        } catch (\Exception $e) {
+            $this->rollback();
+
+            throw $e;
+        } finally {
+            $this->entityManager->clear();
+        }
     }
 
     public function rollback()
